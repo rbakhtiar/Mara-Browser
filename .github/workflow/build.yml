@@ -1,0 +1,57 @@
+name: Build Mara Browser
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "package.json"
+      - "main.js"
+      - "preload.js"
+      - "index.html"
+      - "styles.css"
+      - "renderer.js"
+      - ".github/workflows/build.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: windows
+          - os: macos-latest
+            artifact: macos
+          - os: ubuntu-latest
+            artifact: linux
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Download source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Package Mara
+        run: npm run dist
+
+      - name: Upload packaged application
+        uses: actions/upload-artifact@v4
+        with:
+          name: mara-${{ matrix.artifact }}
+          path: release/*
+          if-no-files-found: error
+          retention-days: 7
