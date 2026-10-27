@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>New Tab — Mara</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: var(--mara-bg, #07120F);
+      color: var(--mara-text, #F1F4EF);
+    }
+    main {
+      width: min(760px, 90%);
+      margin: 12vh auto 0;
+    }
+    .brand {
+      color: var(--mara-gold, #D9BD83);
+      font-size: clamp(40px, 8vw, 70px);
+      letter-spacing: 8px;
+      margin-bottom: 8px;
+    }
+    .subtitle { opacity: .7; margin-bottom: 36px; }
+    form { display: flex; gap: 8px; }
+    input, select, button {
+      padding: 12px;
+      border-radius: 9px;
+      border: 1px solid var(--mara-gold, #D9BD83);
+      background: var(--mara-surface, #10211B);
+      color: var(--mara-text, #F1F4EF);
+    }
+    input { min-width: 0; flex: 1; }
+    button { cursor: pointer; }
+    h2 { margin-top: 36px; font-size: 17px; }
+    #quickLinks, #bookmarkList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    a { color: var(--mara-gold, #D9BD83); }
+    .site { padding: 12px; border: 1px solid #ffffff24; border-radius: 9px; }
+    @media (max-width: 520px) {
+      form { flex-wrap: wrap; }
+      form input { flex-basis: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand">MARA</div>
+    <p class="subtitle">A calmer, more customizable way to browse.</p>
+
+    <form id="searchForm">
+      <input id="newTabSearch" type="text"
+        placeholder="Search or enter a website"
+        aria-label="Search or enter a website" autofocus>
+      <button type="submit">Explore</button>
+    </form>
+
+    <h2>Quick access</h2>
+    <div id="quickLinks">
+      <a class="site" href="https://duckduckgo.com/">DuckDuckGo</a>
+      <a class="site" href="https://github.com/">GitHub</a>
+      <a class="site" href="https://www.wikipedia.org/">Wikipedia</a>
+    </div>
+
+    <h2>Your bookmarks</h2>
+    <div id="bookmarkList"></div>
+
+    <p><a href="settings.html">Mara settings</a></p>
+  </main>
+
+  <script src="mara-utils.js"></script>
+  <script src="search.js"></script>
+  <script src="bookmarks.js"></script>
+  <script src="themes.js"></script>
+  <script>
+    const form = document.querySelector("#searchForm");
+    const input = document.querySelector("#newTabSearch");
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+
+      const destination = window.MaraSearch?.resolve(input.value);
+
+      if (!destination) return;
+
+      if (window.maraBridge?.navigate) {
+        window.maraBridge.navigate(destination);
+      } else {
+        // Fallback for standalone testing.
+        window.location.assign(destination);
+      }
+    });
+
+    function renderBookmarks() {
+      const container = document.querySelector("#bookmarkList");
+      container.replaceChildren();
+
+      const bookmarks = window.MaraBookmarks?.getAll() || [];
+
+      if (!bookmarks.length) {
+        container.textContent = "Your saved bookmarks will appear here.";
+        return;
+      }
+
+      for (const item of bookmarks) {
+        const link = document.createElement("a");
+        link.className = "site";
+        link.href = item.url;
+        link.textContent = item.title;
+        container.append(link);
+      }
+    }
+
+    renderBookmarks();
+  </script>
+</body>
+</html>
