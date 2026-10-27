@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Settings — Mara</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      background: var(--mara-bg, #07120F);
+      color: var(--mara-text, #F1F4EF);
+    }
+    main { max-width: 720px; margin: 0 auto; }
+    section {
+      padding: 18px;
+      margin: 18px 0;
+      border: 1px solid #ffffff24;
+      border-radius: 12px;
+      background: var(--mara-surface, #10211B);
+    }
+    label { display: block; margin: 12px 0; }
+    select, button {
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid var(--mara-gold, #D9BD83);
+      border-radius: 8px;
+      background: var(--mara-bg, #07120F);
+      color: var(--mara-text, #F1F4EF);
+    }
+    button { cursor: pointer; }
+    .warning { opacity: .75; font-size: 14px; }
+    #message { min-height: 24px; color: var(--mara-gold, #D9BD83); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Mara Settings</h1>
+    <p>Make your browser yours.</p>
+
+    <section>
+      <h2>Appearance</h2>
+      <label for="themeSelect">Theme</label>
+      <select id="themeSelect">
+        <option value="emerald">Dark Emerald</option>
+        <option value="midnight">Midnight</option>
+        <option value="arctic">Arctic</option>
+        <option value="champagne">Champagne</option>
+      </select>
+    </section>
+
+    <section>
+      <h2>Search</h2>
+      <label for="searchEngine">Default search engine</label>
+      <select id="searchEngine">
+        <option value="duckduckgo">DuckDuckGo</option>
+        <option value="google">Google</option>
+        <option value="bing">Bing</option>
+      </select>
+    </section>
+
+    <section>
+      <h2>Saved data</h2>
+      <p>Bookmarks and this app's recorded history are stored locally.</p>
+      <button id="clearHistory" type="button">Clear Mara history</button>
+      <button id="clearBookmarks" type="button">Clear bookmarks</button>
+      <p class="warning">
+        These actions clear Mara's local lists. They do not erase
+        your complete Chromium profile or data saved by websites.
+      </p>
+    </section>
+
+    <section>
+      <h2>Privacy</h2>
+      <p>
+        Mara's privacy controls are still being developed.
+        This page does not claim that tracker blocking or private
+        browsing is active.
+      </p>
+      <div id="privacyStatus" aria-live="polite"></div>
+    </section>
+
+    <p id="message" role="status" aria-live="polite"></p>
+    <p><a href="newtab.html">Back to New Tab</a></p>
+  </main>
+
+  <script src="mara-utils.js"></script>
+  <script src="themes.js"></script>
+  <script src="search.js"></script>
+  <script src="bookmarks.js"></script>
+  <script src="history.js"></script>
+  <script src="privacy.js"></script>
+
+  <script>
+    const message = document.querySelector("#message");
+
+    document.querySelector("#clearHistory").addEventListener("click", () => {
+      if (!confirm("Clear Mara's locally recorded browsing history?")) return;
+
+      window.MaraHistory?.clear();
+      message.textContent = "Mara history cleared.";
+    });
+
+    document.querySelector("#clearBookmarks").addEventListener("click", () => {
+      if (!confirm("Remove all Mara bookmarks?")) return;
+
+      window.MaraBookmarks?.clear();
+      message.textContent = "Bookmarks cleared.";
+    });
+
+    window.MaraPrivacy?.render(
+      document.querySelector("#privacyStatus")
+    );
+  </script>
+</body>
+</html>
