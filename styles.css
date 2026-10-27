@@ -1,338 +1,908 @@
+
+/* =========================================================
+   MARA BROWSER — LUXURY EMERALD DESIGN SYSTEM
+   Dark emerald • Champagne gold • Restrained glass effects
+   ========================================================= */
+
 :root {
   color-scheme: dark;
-  --bg: #071713;
-  --surface: #0d211b;
-  --surface-raised: #122c23;
-  --border: #244638;
-  --green: #b8e1cb;
-  --muted: #88aa98;
-  --gold: #d6bd83;
-  --text: #edf5ef;
+
+  --mara-bg: #07120f;
+  --mara-bg-soft: #0a1914;
+  --mara-surface: #10211b;
+  --mara-surface-raised: #162b23;
+  --mara-surface-hover: #1c382d;
+
+  --mara-accent: #137b5b;
+  --mara-accent-hover: #19966d;
+  --mara-gold: #d9bd83;
+  --mara-gold-soft: #bba16f;
+
+  --mara-text: #f1f4ef;
+  --mara-text-secondary: #a8b9ae;
+  --mara-text-muted: #71867a;
+
+  --mara-border: rgba(217, 189, 131, 0.16);
+  --mara-border-strong: rgba(217, 189, 131, 0.38);
+  --mara-glass: rgba(16, 33, 27, 0.96);
+
+  --mara-danger: #e28a83;
+  --mara-success: #73c9a1;
+
+  --mara-radius-sm: 7px;
+  --mara-radius-md: 11px;
+  --mara-radius-lg: 16px;
+
+  --mara-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.24);
+
+  --mara-font:
+    "Alegreya", Georgia, "Times New Roman", serif;
+
+  --mara-ui-font:
+    "Inter", "Segoe UI", Arial, sans-serif;
+
+  font-family: var(--mara-ui-font);
+  background: var(--mara-bg);
+  color: var(--mara-text);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
 body {
+  width: 100%;
+  min-width: 320px;
+  min-height: 100%;
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Inter, "Segoe UI", sans-serif;
+}
+
+body {
+  background:
+    radial-gradient(
+      ellipse at 50% -60%,
+      rgba(24, 104, 73, 0.18),
+      transparent 65%
+    ),
+    var(--mara-bg);
+
+  color: var(--mara-text);
+  font-family: var(--mara-ui-font);
   font-size: 13px;
 }
 
 button,
-input {
+input,
+textarea,
+select {
   font: inherit;
 }
 
 button {
-  color: var(--text);
-  cursor: pointer;
+  color: inherit;
 }
 
-.browser-chrome {
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--mara-gold);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+a {
+  color: var(--mara-gold);
+  text-decoration: none;
+}
+
+a:hover {
+  color: #f0d9a8;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* =========================================================
+   BROWSER CHROME
+   Keep this header exactly 116px tall for main.js.
+   ========================================================= */
+
+.mara-chrome {
   position: relative;
-  z-index: 5;
+  z-index: 10;
+
+  display: grid;
+  grid-template-rows: 32px 54px 28px;
+
+  width: 100%;
   height: 116px;
-  background: linear-gradient(145deg, #0e261e, #081711);
-  border-bottom: 1px solid var(--border);
-  user-select: none;
+  padding: 0 13px;
+
+  overflow: visible;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18, 43, 33, 0.98),
+      rgba(7, 18, 15, 0.99) 72%
+    );
+
+  border-bottom: 1px solid var(--mara-border);
+
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.16);
 }
 
-.topbar,
-.navigation,
-.tab-strip {
-  display: flex;
-  align-items: center;
-}
+/* Brand */
 
-.topbar {
-  height: 43px;
-  padding: 0 15px;
-  justify-content: space-between;
-}
-
-.brand {
+.mara-brand {
   display: flex;
   align-items: center;
   gap: 9px;
+  min-width: 0;
+  padding-left: 2px;
+}
+
+.mara-symbol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--mara-gold);
+  font-size: 21px;
+
+  filter:
+    drop-shadow(0 0 8px rgba(217, 189, 131, 0.24));
+}
+
+.mara-wordmark {
+  color: var(--mara-text);
+  font-family: var(--mara-font);
   font-size: 17px;
-  font-weight: 650;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+
+.mara-edition {
+  color: var(--mara-text-muted);
+  font-size: 9px;
+  font-weight: 600;
   letter-spacing: 1.8px;
 }
 
-.brand-icon {
-  width: 27px;
-  height: 27px;
-  display: grid;
-  place-items: center;
-  border: 1px solid #47785f;
-  border-radius: 8px;
-  color: var(--gold);
-  background: #17382b;
-  font-family: Georgia, serif;
-}
+/* Toolbar */
 
-.edition,
-.eyebrow {
-  color: var(--muted);
-  font-size: 9px;
-  letter-spacing: 1.5px;
-}
-
-.window-actions {
+.mara-toolbar {
   display: flex;
   align-items: center;
-  gap: 7px;
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #78c49a;
-  display: inline-block;
-}
-
-.navigation {
-  height: 43px;
-  padding: 0 10px;
   gap: 5px;
+
+  width: 100%;
+  min-width: 0;
 }
 
-.icon-button {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
+.mara-toolbar > button {
+  flex: 0 0 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 34px;
+  padding: 0;
+
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--mara-radius-sm);
+
   background: transparent;
+  color: var(--mara-text-secondary);
+
   font-size: 17px;
-  transition: background 150ms ease, border-color 150ms ease;
+  cursor: pointer;
+
+  transition:
+    color 150ms ease,
+    background 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
 }
 
-.icon-button:hover:not(:disabled) {
-  background: var(--surface-raised);
-  border-color: var(--border);
+.mara-toolbar > button:hover {
+  color: var(--mara-gold);
+  background: var(--mara-surface-hover);
+  border-color: var(--mara-border);
 }
 
-.icon-button:disabled {
-  opacity: 0.3;
-  cursor: default;
+.mara-toolbar > button:active {
+  transform: scale(0.95);
 }
+
+.mara-toolbar #aiBtn {
+  flex-basis: 38px;
+
+  border-color: rgba(217, 189, 131, 0.28);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(19, 123, 91, 0.3),
+      rgba(217, 189, 131, 0.08)
+    );
+
+  color: var(--mara-gold);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.mara-toolbar #aiBtn:hover {
+  background: var(--mara-accent);
+  border-color: var(--mara-gold);
+}
+
+.mara-toolbar #bookmarkBtn {
+  color: var(--mara-gold);
+  font-size: 21px;
+}
+
+/* Address bar */
 
 .address-form {
-  min-width: 0;
-  flex: 1;
+  flex: 1 1 auto;
+
   display: flex;
   align-items: center;
-  height: 32px;
-  padding: 0 5px 0 10px;
-  gap: 8px;
-  background: #071711;
-  border: 1px solid #315744;
+  gap: 9px;
+
+  min-width: 60px;
+  height: 38px;
+  margin: 0 3px;
+  padding: 0 7px 0 12px;
+
+  border: 1px solid var(--mara-border);
   border-radius: 10px;
+
+  background:
+    linear-gradient(
+      120deg,
+      rgba(4, 13, 10, 0.95),
+      rgba(14, 31, 24, 0.94)
+    );
+
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.24);
+
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .address-form:focus-within {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 2px #d6bd8314;
+  border-color: var(--mara-gold-soft);
+
+  box-shadow:
+    0 0 0 2px rgba(217, 189, 131, 0.08),
+    inset 0 1px 3px rgba(0, 0, 0, 0.24);
 }
 
-.lock-icon {
-  color: var(--green);
-  font-size: 16px;
-}
-
-.address-form input {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  border: 0;
-  outline: none;
-  color: var(--text);
-  background: transparent;
-  font-size: 12px;
-}
-
-.address-form input::placeholder {
-  color: #668575;
-}
-
-.go-button {
-  padding: 5px 10px;
-  border: 0;
-  border-radius: 7px;
-  background: #214c38;
-  color: #e0f3e7;
-  font-size: 11px;
-}
-
-.ai-button {
-  color: var(--gold);
-  border-color: #4b4229;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.tab-strip {
-  height: 30px;
-  padding: 0 12px;
-  gap: 12px;
-  background: #091a14;
-}
-
-.tab {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 230px;
-  height: 25px;
-  padding: 0 12px;
-  border: 1px solid var(--border);
-  border-bottom-color: #122d22;
-  border-radius: 7px 7px 0 0;
-  background: #12271e;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.tab-indicator {
-  width: 6px;
-  height: 6px;
+#securityIndicator {
   flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--gold);
-}
-
-#tab-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tab-note {
-  color: #688776;
+  color: var(--mara-success);
   font-size: 10px;
 }
 
-.side-panel {
-  position: absolute;
-  z-index: 10;
-  top: 116px;
-  right: 0;
-  bottom: 0;
-  width: min(340px, 90vw);
-  padding: 20px;
-  border-left: 1px solid var(--border);
-  background: #0a1c15;
-  box-shadow: -12px 0 35px #0004;
+#addressBar {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+  color: var(--mara-text);
+
+  font-size: 12px;
 }
 
-.side-panel[hidden] {
-  display: none;
+#addressBar:focus-visible {
+  outline: none;
 }
 
-.panel-heading {
+#addressBar::placeholder {
+  color: var(--mara-text-muted);
+}
+
+#goBtn {
+  flex-shrink: 0;
+  height: 27px;
+  padding: 0 10px;
+
+  border: 1px solid rgba(217, 189, 131, 0.25);
+  border-radius: 6px;
+
+  background: var(--mara-surface-raised);
+  color: var(--mara-gold);
+
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#goBtn:hover {
+  background: var(--mara-accent);
+  border-color: var(--mara-gold);
+}
+
+/* Status bar */
+
+.mara-statusbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+
+  min-width: 0;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.035);
+
+  color: var(--mara-text-muted);
+  font-size: 10px;
 }
 
-.panel-heading h2 {
-  margin: 7px 0 0;
-  font-family: Georgia, serif;
-  font-size: 22px;
-  font-weight: 500;
+#pageStatus,
+#privacyStatus {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.panel-description {
-  margin: 22px 0;
-  color: #a4bcae;
-  line-height: 1.7;
+#privacyStatus {
+  color: var(--mara-text-secondary);
+  text-align: right;
 }
 
-.privacy-note {
+/* =========================================================
+   UTILITY PANEL
+   ========================================================= */
+
+.utility-panel {
+  position: fixed;
+  top: 124px;
+  right: 12px;
+
+  z-index: 1000;
+
+  width: min(360px, calc(100vw - 24px));
+  max-height: calc(100vh - 140px);
+  overflow: auto;
+
+  padding: 18px;
+
+  border: 1px solid var(--mara-border-strong);
+  border-radius: var(--mara-radius-lg);
+
+  background: var(--mara-glass);
+  color: var(--mara-text);
+
+  box-shadow:
+    0 18px 60px rgba(0, 0, 0, 0.45);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.utility-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+
+  border-bottom: 1px solid var(--mara-border);
+}
+
+.utility-panel-heading strong {
+  color: var(--mara-gold);
+  font-family: var(--mara-font);
+  font-size: 21px;
+  font-weight: 700;
+}
+
+#closePanelBtn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+
+  border: 1px solid var(--mara-border);
+  border-radius: 8px;
+
+  background: transparent;
+  color: var(--mara-text-secondary);
+
+  font-size: 20px;
+  cursor: pointer;
+}
+
+#closePanelBtn:hover {
+  background: var(--mara-surface-hover);
+  color: var(--mara-gold);
+}
+
+#panelContent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#panelContent p,
+#panelContent li {
+  color: var(--mara-text-secondary);
+  line-height: 1.65;
+}
+
+#panelContent ul {
+  padding-left: 20px;
+}
+
+.mara-panel-row {
   display: flex;
   align-items: center;
   gap: 8px;
+
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mara-panel-row button:first-child {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+.mara-panel-row small {
+  color: var(--mara-text-muted);
+  font-size: 10px;
+}
+
+/* =========================================================
+   BUTTONS, INPUTS AND SELECTS
+   Shared with settings.html and newtab.html.
+   ========================================================= */
+
+button,
+select,
+input,
+textarea {
+  accent-color: var(--mara-accent);
+}
+
+button:not(.mara-toolbar button) {
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+#panelContent button,
+body > main button {
+  min-height: 34px;
+  padding: 8px 12px;
+
+  border: 1px solid var(--mara-border);
+  border-radius: var(--mara-radius-sm);
+
+  background: var(--mara-surface-raised);
+  color: var(--mara-text);
+
+  cursor: pointer;
+}
+
+#panelContent button:hover,
+body > main button:hover {
+  background: var(--mara-accent);
+  border-color: var(--mara-gold-soft);
+}
+
+input,
+textarea,
+select {
+  max-width: 100%;
+  padding: 10px 12px;
+
+  border: 1px solid var(--mara-border);
+  border-radius: var(--mara-radius-sm);
+
+  background: var(--mara-bg-soft);
+  color: var(--mara-text);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--mara-text-muted);
+}
+
+select {
+  cursor: pointer;
+}
+
+label {
+  color: var(--mara-text-secondary);
+  line-height: 1.8;
+}
+
+/* =========================================================
+   NEW TAB PAGE
+   ========================================================= */
+
+body:has(#quickLinks) main,
+body:has(#searchForm) main {
+  max-width: 760px;
+  margin: 12vh auto 0;
+  padding: 0 22px 40px;
+}
+
+.brand {
+  color: var(--mara-gold);
+  font-family: var(--mara-font);
+  font-size: clamp(42px, 8vw, 72px);
+  font-weight: 700;
+  letter-spacing: 9px;
+
+  text-shadow:
+    0 0 35px rgba(217, 189, 131, 0.08);
+}
+
+.subtitle {
+  margin: 4px 0 32px;
+  color: var(--mara-text-secondary);
+  font-family: var(--mara-font);
+  font-size: 18px;
+}
+
+#searchForm {
+  display: flex;
+  gap: 9px;
+  width: 100%;
+}
+
+#searchForm input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+
+  border-radius: 12px;
+  border-color: var(--mara-border-strong);
+
+  background: var(--mara-surface);
+  box-shadow: var(--mara-shadow);
+}
+
+#searchForm button {
+  min-width: 80px;
+  border-radius: 10px;
+
+  background: var(--mara-accent);
+  border-color: var(--mara-gold-soft);
+  color: white;
+}
+
+#searchForm button:hover {
+  background: var(--mara-accent-hover);
+}
+
+body:has(#quickLinks) h2,
+body:has(#searchForm) h2 {
+  margin: 34px 0 14px;
+
+  color: var(--mara-gold);
+  font-family: var(--mara-font);
+  font-size: 21px;
+}
+
+#quickLinks,
+#bookmarkList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.site {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  max-width: 100%;
+  padding: 11px 14px;
+
+  overflow-wrap: anywhere;
+
+  border: 1px solid var(--mara-border);
+  border-radius: 10px;
+
+  background: var(--mara-surface);
+  color: var(--mara-text-secondary);
+
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    background 150ms ease;
+}
+
+.site:hover {
+  transform: translateY(-2px);
+  border-color: var(--mara-gold-soft);
+  background: var(--mara-surface-hover);
+  color: var(--mara-gold);
+}
+
+/* =========================================================
+   SETTINGS PAGE
+   ========================================================= */
+
+body:has(#clearHistory) {
+  padding: 28px 20px 50px;
+}
+
+body:has(#clearHistory) main {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+body:has(#clearHistory) h1 {
+  margin: 0;
+  color: var(--mara-gold);
+  font-family: var(--mara-font);
+  font-size: 38px;
+  letter-spacing: 0.5px;
+}
+
+body:has(#clearHistory) main > p {
+  color: var(--mara-text-secondary);
+  line-height: 1.7;
+}
+
+body:has(#clearHistory) section {
+  margin: 18px 0;
+  padding: 20px;
+
+  border: 1px solid var(--mara-border);
+  border-radius: var(--mara-radius-lg);
+
+  background:
+    linear-gradient(
+      140deg,
+      rgba(22, 43, 35, 0.96),
+      rgba(12, 27, 21, 0.96)
+    );
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+body:has(#clearHistory) section h2 {
+  margin: 0 0 15px;
+
+  color: var(--mara-gold);
+  font-family: var(--mara-font);
+  font-size: 23px;
+}
+
+body:has(#clearHistory) section label {
+  display: block;
+  margin: 12px 0;
+}
+
+body:has(#clearHistory) section select {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+}
+
+body:has(#clearHistory) section button {
+  margin: 5px 5px 5px 0;
+}
+
+.warning {
+  color: var(--mara-text-muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+#message {
+  min-height: 22px;
+  color: var(--mara-gold);
+}
+
+/* =========================================================
+   BOOKMARK AND HISTORY MODULES
+   ========================================================= */
+
+.mara-bookmark,
+.mara-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+
   padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  color: var(--green);
-  background: var(--surface);
-  font-size: 11px;
+
+  border-bottom: 1px solid var(--mara-border);
+  background: rgba(255, 255, 255, 0.015);
 }
 
-.ai-placeholder {
-  margin-top: 40px;
-  text-align: center;
+.mara-bookmark button:first-child,
+.mara-history-item button:first-child {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
 }
 
-.ai-symbol {
-  color: var(--gold);
-  font-size: 35px;
+.mara-history-item small {
+  color: var(--mara-text-muted);
 }
 
-.ai-placeholder p {
-  color: var(--green);
+/* =========================================================
+   SCROLLBARS
+   ========================================================= */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #315344 var(--mara-bg);
 }
 
-.ai-placeholder small {
-  color: var(--muted);
-  line-height: 1.6;
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
 }
 
-#toast {
-  position: fixed;
-  z-index: 20;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 90vw;
-  padding: 10px 15px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: #10271d;
-  color: var(--text);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 150ms ease;
+::-webkit-scrollbar-track {
+  background: var(--mara-bg);
 }
 
-#toast.visible {
-  opacity: 1;
+::-webkit-scrollbar-thumb {
+  background: #315344;
+  border: 2px solid var(--mara-bg);
+  border-radius: 10px;
 }
 
-@media (max-width: 480px) {
-  .topbar {
-    padding: 0 9px;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mara-gold-soft);
+}
+
+/* =========================================================
+   RESPONSIVE LAYOUT
+   ========================================================= */
+
+@media (max-width: 760px) {
+  .mara-chrome {
+    padding: 0 8px;
   }
 
-  .edition,
-  .window-actions,
-  .tab-note {
-    display: none;
-  }
-
-  .navigation {
-    padding: 0 5px;
+  .mara-toolbar {
     gap: 2px;
   }
 
-  .icon-button {
-    width: 27px;
+  .mara-toolbar > button {
+    flex-basis: 30px;
+    height: 32px;
+  }
+
+  .mara-toolbar #aiBtn {
+    flex-basis: 34px;
   }
 
   .address-form {
-    gap: 4px;
-    padding-left: 6px;
+    gap: 5px;
+    margin: 0 1px;
+    padding: 0 6px;
   }
 
-  .go-button {
-    padding: 5px 6px;
+  #addressBar {
+    font-size: 11px;
+  }
+
+  .mara-edition {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .mara-chrome {
+    grid-template-rows: 30px 56px 30px;
+    height: 116px;
+    padding: 0 6px;
+  }
+
+  .mara-wordmark {
+    font-size: 15px;
+    letter-spacing: 3px;
+  }
+
+  .mara-toolbar {
+    gap: 1px;
+  }
+
+  .mara-toolbar > button {
+    flex-basis: 27px;
+    font-size: 14px;
+  }
+
+  .mara-toolbar #aiBtn {
+    flex-basis: 30px;
+    font-size: 10px;
+  }
+
+  .address-form {
+    height: 36px;
+    min-width: 40px;
+  }
+
+  #securityIndicator {
+    display: none;
+  }
+
+  #goBtn {
+    padding: 0 6px;
+  }
+
+  .mara-statusbar {
+    gap: 6px;
+    font-size: 9px;
+  }
+
+  .utility-panel {
+    right: 6px;
+    width: calc(100vw - 12px);
+  }
+
+  body:has(#clearHistory) {
+    padding: 20px 12px 35px;
+  }
+
+  body:has(#clearHistory) section {
+    padding: 15px;
+  }
+
+  body:has(#quickLinks) main,
+  body:has(#searchForm) main {
+    margin-top: 8vh;
+    padding: 0 14px 30px;
+  }
+
+  .brand {
+    letter-spacing: 6px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY: REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
