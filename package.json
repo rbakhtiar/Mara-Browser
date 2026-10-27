@@ -1,0 +1,41 @@
+{
+  "name": "mara-browser",
+  "version": "0.1.0",
+  "description": "Mara — AI-first, privacy-first, customizable browser",
+  "main": "main.js",
+  "author": "Mara",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.mara.browser",
+    "productName": "Mara Browser",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "styles.css",
+      "renderer.js",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage",
+      "category": "Network;WebBrowser"
+    }
+  }
+}
