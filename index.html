@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:;"
+  >
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mara Browser</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="renderer.js" defer></script>
+</head>
+<body>
+  <header class="browser-chrome">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-icon">M</div>
+        <span>Mara</span>
+        <span class="edition">BROWSER</span>
+      </div>
+
+      <div class="window-actions">
+        <span class="status-dot"></span>
+        <span id="status">Ready</span>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <button id="back" class="icon-button" aria-label="Back"
+        title="Back" disabled>←</button>
+      <button id="forward" class="icon-button" aria-label="Forward"
+        title="Forward" disabled>→</button>
+      <button id="reload" class="icon-button" aria-label="Reload"
+        title="Reload">↻</button>
+      <button id="home" class="icon-button" aria-label="Home"
+        title="Home">⌂</button>
+
+      <form id="address-form" class="address-form">
+        <span class="lock-icon">⌑</span>
+        <input
+          id="address"
+          type="text"
+          placeholder="Search or enter a website"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="Address bar"
+        >
+        <button type="submit" class="go-button">Go</button>
+      </form>
+
+      <button id="privacy" class="icon-button" title="Privacy information"
+        aria-label="Privacy information">◇</button>
+      <button id="ai-toggle" class="icon-button ai-button"
+        title="Mara AI" aria-label="Mara AI">AI</button>
+    </div>
+
+    <div class="tab-strip">
+      <div class="tab active">
+        <span class="tab-indicator"></span>
+        <span id="tab-title">New tab</span>
+      </div>
+      <span class="tab-note">Mara Preview</span>
+    </div>
+  </header>
+
+  <aside id="ai-panel" class="side-panel" hidden>
+    <div class="panel-heading">
+      <div>
+        <span class="eyebrow">MARA INTELLIGENCE</span>
+        <h2>Your AI space</h2>
+      </div>
+      <button id="close-ai" class="icon-button" aria-label="Close AI panel">×</button>
+    </div>
+
+    <p class="panel-description">
+      Your AI assistant will live here. No page content is sent to an AI
+      service in this preview.
+    </p>
+
+    <div class="privacy-note">
+      <span class="status-dot"></span>
+      AI provider not connected
+    </div>
+
+    <div class="ai-placeholder">
+      <span class="ai-symbol">✳</span>
+      <p>What would you like to explore?</p>
+      <small>AI chat will be enabled in a future release.</small>
+    </div>
+  </aside>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
