@@ -4,69 +4,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark">
-  <meta
-    http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self';"
-  >
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self';">
   <title>Mara Browser</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <header class="mara-chrome">
-    <div class="mara-brand">
-      <span class="mara-symbol" aria-hidden="true">✦</span>
-      <span class="mara-wordmark">MARA</span>
-      <span class="mara-edition">BROWSER</span>
+<body class="browser-shell">
+  <header class="browser-header">
+    <div class="brand-row">
+      <div class="brand">
+        <span class="brand-mark">✦</span>
+        <span class="brand-name">MARA</span>
+        <span class="brand-caption">BROWSER</span>
+      </div>
+      <span id="privateBadge" hidden>PRIVATE SESSION</span>
+      <button id="customizeBtn" class="quiet-button">Customize</button>
     </div>
 
-    <nav class="mara-toolbar" aria-label="Browser navigation">
-      <button id="backBtn" type="button" title="Back" aria-label="Back">←</button>
-      <button id="forwardBtn" type="button" title="Forward" aria-label="Forward">→</button>
-      <button id="reloadBtn" type="button" title="Reload" aria-label="Reload">↻</button>
-      <button id="homeBtn" type="button" title="New Tab" aria-label="New Tab">⌂</button>
+    <div id="tabStrip" class="tab-strip" role="tablist" aria-label="Browser tabs"></div>
+
+    <nav class="navigation-row" aria-label="Navigation">
+      <button id="backBtn" class="icon-button" title="Back">←</button>
+      <button id="forwardBtn" class="icon-button" title="Forward">→</button>
+      <button id="reloadBtn" class="icon-button" title="Reload">↻</button>
+      <button id="homeBtn" class="icon-button" title="New tab">⌂</button>
 
       <form id="addressForm" class="address-form">
-        <span id="securityIndicator" aria-hidden="true">◆</span>
-        <input
-          id="addressBar"
-          type="text"
-          inputmode="url"
-          autocomplete="off"
-          spellcheck="false"
-          aria-label="Address or search"
-          placeholder="Search privately or enter an address"
-        >
-        <button id="goBtn" type="submit" title="Go">Go</button>
+        <span id="secureMark" aria-hidden="true">◆</span>
+        <input id="addressBar" placeholder="Search or enter a website"
+          aria-label="Search or enter a website"
+          autocomplete="off" spellcheck="false">
+        <button type="submit" class="go-button">Go</button>
       </form>
 
-      <button id="bookmarkBtn" type="button" title="Save bookmark" aria-label="Save bookmark">☆</button>
-      <button id="aiBtn" type="button" title="Mara AI (Ctrl+K)" aria-label="Mara AI">AI</button>
-      <button id="privacyBtn" type="button" title="Privacy status" aria-label="Privacy">◈</button>
-      <button id="settingsBtn" type="button" title="Settings" aria-label="Settings">⚙</button>
+      <button id="bookmarkBtn" class="icon-button gold" title="Bookmark">☆</button>
+      <button id="bookmarksBtn" class="icon-button" title="Bookmarks">▤</button>
+      <button id="historyBtn" class="icon-button" title="History">◷</button>
+      <button id="privacyBtn" class="icon-button" title="Privacy">◈</button>
     </nav>
 
-    <div class="mara-statusbar">
-      <span id="pageStatus" role="status" aria-live="polite">Mara is ready</span>
-      <span id="privacyStatus">Privacy controls available</span>
+    <div class="status-row">
+      <span id="statusText" role="status" aria-live="polite">Ready</span>
+      <span id="statusRight">No AI service · Chromium engine</span>
     </div>
   </header>
 
-  <aside id="utilityPanel" class="utility-panel" hidden aria-live="polite">
-    <div class="utility-panel-heading">
-      <strong id="panelTitle">Mara</strong>
-      <button id="closePanelBtn" type="button" aria-label="Close panel">×</button>
+  <aside id="sidePanel" class="side-panel" hidden>
+    <div class="panel-heading">
+      <h2 id="panelTitle">Mara</h2>
+      <button id="panelClose" class="icon-button" aria-label="Close panel">×</button>
     </div>
-    <div id="panelContent"></div>
+    <div id="panelBody"></div>
   </aside>
 
-  <script src="mara-utils.js"></script>
+  <script src="settings-schema.js"></script>
+  <script src="theme-engine.js"></script>
   <script src="bookmarks.js"></script>
-  <script src="themes.js"></script>
-  <script src="search.js"></script>
   <script src="history.js"></script>
   <script src="privacy.js"></script>
-  <script src="ai.js"></script>
   <script src="shortcuts.js"></script>
   <script src="renderer.js"></script>
 </body>
