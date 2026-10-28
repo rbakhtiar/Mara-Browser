@@ -1,9 +1,10 @@
+
 {
   "name": "mara-browser",
-  "version": "0.1.0",
-  "description": "Mara — AI-first, privacy-first, customizable browser",
+  "version": "1.0.0",
+  "description": "Mara — a customizable Chromium desktop browser",
   "main": "main.js",
-  "author": "Mara",
+  "author": "Mara Project",
   "license": "MIT",
   "scripts": {
     "start": "electron .",
@@ -16,17 +17,15 @@
   "build": {
     "appId": "com.mara.browser",
     "productName": "Mara Browser",
+    "asar": true,
+    "files": [
+      "**/*",
+      "!release",
+      "!node_modules/.cache"
+    ],
     "directories": {
       "output": "release"
     },
-    "files": [
-      "main.js",
-      "preload.js",
-      "index.html",
-      "styles.css",
-      "renderer.js",
-      "package.json"
-    ],
     "win": {
       "target": "nsis"
     },
@@ -34,8 +33,7 @@
       "target": "dmg"
     },
     "linux": {
-      "target": "AppImage",
-      "category": "Network;WebBrowser"
+      "target": "AppImage"
     }
   }
 }
