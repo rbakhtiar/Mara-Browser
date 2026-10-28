@@ -3,297 +3,247 @@
 
 (() => {
   const $ = id => document.getElementById(id);
+  let tabs = [];
+  let activeTabId = null;
 
-  const addressBar = $("addressBar");
-  const pageStatus = $("pageStatus");
-  const privacyStatus = $("privacyStatus");
-  const panel = $("utilityPanel");
-  const panelTitle = $("panelTitle");
-  const panelContent = $("panelContent");
+  const address = $("addressBar");
+  const panel = $("sidePanel");
+  const panelBody = $("panelBody");
 
-  function setStatus(message) {
-    if (pageStatus) pageStatus.textContent = message;
+  function status(message) {
+    $("statusText").textContent = message;
   }
 
-  function navigate(input) {
-    const url = window.MaraSearch?.resolve(input);
-
-    if (!url) {
-      setStatus("Enter a website or search term.");
-      return;
-    }
-
-    if (!window.maraBridge?.navigate) {
-      setStatus("Browser engine is not connected. Check preload.js.");
-      return;
-    }
-
-    setStatus("Opening page…");
-    window.maraBridge.navigate(url);
+  function activeTab() {
+    return tabs.find(tab => tab.id === activeTabId);
   }
 
-  function openInternalPage(page) {
-    if (!["newtab", "settings"].includes(page)) return;
+  function navigate(value) {
+    const text = String(value || "").trim();
+    if (!text || !activeTabId) return;
 
-    if (!window.maraBridge?.navigate) {
-      setStatus("Browser engine is not connected.");
-      return;
+    let destination;
+
+    try {
+      const url = new URL(text);
+      destination = ["http:", "https:"].includes(url.protocol)
+        ? url.href
+        : null;
+    } catch {
+      destination = null;
     }
 
-    window.maraBridge.navigate(`mara://${page}`);
+    if (!destination) {
+      const domain = /^[a-z0-9-]+(\.[a-z0-9-]+)+(:\d+)?(\/.*)?$/i;
+
+      destination = !/\s/.test(text) && domain.test(text)
+        ? "https://" + text
+        : "https://duckduckgo.com/?q=" + encodeURIComponent(text);
+    }
+
+    status("Loading page…");
+    window.maraBridge.navigate(activeTabId, destination)
+      .catch(error => status(error.message || "Navigation failed"));
+  }
+
+  function renderTabs() {
+    const strip = $("tabStrip");
+    strip.replaceChildren();
+
+    for (const tab of tabs) {
+      const item = document.createElement("div");
+      item.className = "tab" + (tab.id === activeTabId ? " active" : "");
+      item.setAttribute("role", "tab");
+      item.setAttribute("aria-selected", String(tab.id === activeTabId));
+
+      const select = document.createElement("button");
+      select.className = "tab-select";
+      select.textContent = (tab.private ? "◐ " : "") + tab.title;
+      select.title = tab.url;
+      select.addEventListener("click", () => {
+        window.maraBridge.activateTab(tab.id);
+      });
+
+      const close = document.createElement("button");
+      close.className = "tab-close";
+      close.textContent = "×";
+      close.title = "Close tab";
+      close.addEventListener("click", event => {
+        event.stopPropagation();
+        window.maraBridge.closeTab(tab.id);
+      });
+
+      item.append(select, close);
+      strip.append(item);
+    }
+
+    const add = document.createElement("button");
+    add.className = "add-tab";
+    add.textContent = "+";
+    add.title = "New tab (Ctrl+T)";
+    add.addEventListener("click", () => window.maraBridge.newTab());
+    strip.append(add);
+
+    $("privateBadge").hidden = !Boolean(activeTab()?.private);
+
+    if (activeTab()) {
+      const url = activeTab().url || "";
+      address.value = url.startsWith("file:") ? "Mara internal page" : url;
+      $("secureMark").textContent = url.startsWith("https://") ? "◆" : "◇";
+      document.title = `${activeTab().title} — Mara`;
+    }
   }
 
   function showPanel(title, content) {
-    panelTitle.textContent = title;
-    panelContent.replaceChildren();
+    $("panelTitle").textContent = title;
+    panelBody.replaceChildren();
 
     if (typeof content === "string") {
       const p = document.createElement("p");
       p.textContent = content;
-      panelContent.append(p);
+      panelBody.append(p);
     } else if (content) {
-      panelContent.append(content);
+      panelBody.append(content);
     }
 
     panel.hidden = false;
   }
 
-  function closePanel() {
-    panel.hidden = true;
+  function button(label, action) {
+    const el = document.createElement("button");
+    el.type = "button";
+    el.className = "panel-action";
+    el.textContent = label;
+    el.addEventListener("click", action);
+    return el;
   }
 
-  function makeButton(text, action) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = text;
-    button.addEventListener("click", action);
-    return button;
+  function showBookmarks() {
+    const content = document.createElement("div");
+    const entries = window.MaraBookmarks.getAll();
+
+    if (!entries.length) {
+      content.textContent = "No bookmarks yet. Press ☆ to save a page.";
+    }
+
+    for (const entry of entries) {
+      const row = document.createElement("div");
+      row.className = "panel-item";
+
+      row.append(
+        button(entry.title, () => navigate(entry.url)),
+        button("×", () => {
+          window.MaraBookmarks.remove(entry.id);
+          showBookmarks();
+        })
+      );
+
+      content.append(row);
+    }
+
+    showPanel("Bookmarks", content);
   }
 
-  function openBookmarksPanel() {
-    const container = document.createElement("div");
-    const bookmarks = window.MaraBookmarks?.getAll() || [];
+  function showHistory() {
+    const content = document.createElement("div");
+    const entries = window.MaraHistory.getAll();
 
-    if (!bookmarks.length) {
-      container.textContent = "No bookmarks saved yet. Press ☆ to save a page.";
-    } else {
-      for (const item of bookmarks) {
-        const row = document.createElement("div");
-        row.className = "mara-panel-row";
+    if (!entries.length) {
+      content.textContent = "No visits recorded yet.";
+    }
 
-        const open = makeButton(item.title || item.url, () => navigate(item.url));
-        const remove = makeButton("Remove", () => {
-          window.MaraBookmarks.remove(item.id);
-          openBookmarksPanel();
-        });
+    for (const entry of entries) {
+      const row = document.createElement("div");
+      row.className = "panel-item";
+      row.append(button(entry.title || entry.url, () => navigate(entry.url)));
+      content.append(row);
+    }
 
-        row.append(open, remove);
-        container.append(row);
+    content.append(button("Clear Mara history", () => {
+      if (confirm("Clear locally recorded Mara history?")) {
+        window.MaraHistory.clear();
+        showHistory();
       }
-    }
-
-    showPanel("Your Bookmarks", container);
-  }
-
-  function openHistoryPanel() {
-    const container = document.createElement("div");
-    const history = window.MaraHistory?.getAll() || [];
-
-    if (!history.length) {
-      container.textContent = "No locally recorded visits yet.";
-    } else {
-      for (const item of history) {
-        const row = document.createElement("div");
-        row.className = "mara-panel-row";
-
-        const open = makeButton(item.title || item.url, () => navigate(item.url));
-        const date = document.createElement("small");
-        date.textContent = new Date(item.visitedAt).toLocaleString();
-
-        row.append(open, date);
-        container.append(row);
-      }
-    }
-
-    container.append(
-      makeButton("Clear Mara history", () => {
-        if (confirm("Clear Mara's locally recorded history?")) {
-          window.MaraHistory.clear();
-          openHistoryPanel();
-        }
-      })
-    );
-
-    showPanel("Browsing History", container);
-  }
-
-  async function openPrivacyPanel() {
-    const container = document.createElement("div");
-    const result = await window.MaraPrivacy?.getStatus();
-
-    const intro = document.createElement("p");
-    intro.textContent = result?.message ||
-      "Privacy status is not connected yet.";
-
-    const list = document.createElement("ul");
-
-    for (const item of [
-      "Permission requests are controlled by the Electron main process.",
-      "A full tracker blocker is not implemented yet.",
-      "Private browsing is not implemented yet."
-    ]) {
-      const li = document.createElement("li");
-      li.textContent = item;
-      list.append(li);
-    }
-
-    container.append(intro, list);
-    showPanel("Mara Privacy", container);
-  }
-
-  function openSettingsPanel() {
-    const container = document.createElement("div");
-
-    const themeLabel = document.createElement("label");
-    themeLabel.textContent = "Appearance ";
-
-    const themeSelect = document.createElement("select");
-    themeSelect.id = "themeSelect";
-
-    for (const [value, theme] of Object.entries(window.MaraThemes.themes)) {
-      const option = document.createElement("option");
-      option.value = value;
-      option.textContent = theme.name;
-      themeSelect.append(option);
-    }
-
-    themeSelect.value = window.MaraUtils.getSetting("theme", "emerald");
-    themeSelect.addEventListener("change", () => {
-      window.MaraThemes.apply(themeSelect.value);
-    });
-
-    themeLabel.append(themeSelect);
-
-    const engineLabel = document.createElement("label");
-    engineLabel.textContent = "Search engine ";
-
-    const engineSelect = document.createElement("select");
-    engineSelect.id = "searchEngine";
-
-    for (const [value, engine] of Object.entries(window.MaraSearch.engines)) {
-      const option = document.createElement("option");
-      option.value = value;
-      option.textContent = engine.name;
-      engineSelect.append(option);
-    }
-
-    engineSelect.value = window.MaraSearch.getEngine();
-    engineSelect.addEventListener("change", () => {
-      window.MaraSearch.setEngine(engineSelect.value);
-    });
-
-    engineLabel.append(engineSelect);
-
-    container.append(themeLabel, engineLabel);
-    container.append(makeButton("Open full settings page", () => {
-      closePanel();
-      openInternalPage("settings");
     }));
 
-    showPanel("Mara Settings", container);
+    showPanel("History", content);
   }
 
-  function bind(id, callback) {
-    const element = $(id);
-    if (element) element.addEventListener("click", callback);
+  async function showPrivacy() {
+    const info = await window.MaraPrivacy.getStatus();
+    const content = document.createElement("div");
+
+    for (const [key, value] of Object.entries(info)) {
+      const p = document.createElement("p");
+      p.textContent = `${key}: ${String(value)}`;
+      content.append(p);
+    }
+
+    showPanel("Privacy status", content);
   }
 
   function init() {
-    $("addressForm")?.addEventListener("submit", event => {
+    $("addressForm").addEventListener("submit", event => {
       event.preventDefault();
-      navigate(addressBar.value);
+      navigate(address.value);
     });
 
-    bind("backBtn", () => window.maraBridge?.back?.());
-    bind("forwardBtn", () => window.maraBridge?.forward?.());
-    bind("reloadBtn", () => window.maraBridge?.reload?.());
-    bind("homeBtn", () => openInternalPage("newtab"));
-    bind("settingsBtn", openSettingsPanel);
-    bind("privacyBtn", openPrivacyPanel);
-    bind("bookmarkBtn", () => {
-      const url = window.MaraCurrentUrl;
+    $("backBtn").addEventListener("click", () => window.maraBridge.back());
+    $("forwardBtn").addEventListener("click", () => window.maraBridge.forward());
+    $("reloadBtn").addEventListener("click", () => window.maraBridge.reload());
+    $("homeBtn").addEventListener("click", () => window.maraBridge.newTab());
+    $("customizeBtn").addEventListener("click", () => {
+      window.maraBridge.newTab().then(id => {
+        window.maraBridge.navigate(id, "mara://customize");
+      });
+    });
 
-      if (!url || !window.MaraUtils.isSafeWebUrl(url)) {
-        setStatus("Open a website before bookmarking it.");
+    $("bookmarkBtn").addEventListener("click", () => {
+      const tab = activeTab();
+      if (!tab || !/^https?:/.test(tab.url)) {
+        status("Open a website before bookmarking.");
         return;
       }
 
-      try {
-        window.MaraBookmarks.add(url, document.title || url);
-        setStatus("Bookmark saved.");
-      } catch {
-        setStatus("Could not save this bookmark.");
-      }
+      window.MaraBookmarks.add(tab.url, tab.title);
+      status("Bookmark saved.");
     });
 
-    bind("aiBtn", () => {
-      window.MaraAI?.toggle?.();
-    });
+    $("bookmarksBtn").addEventListener("click", showBookmarks);
+    $("historyBtn").addEventListener("click", showHistory);
+    $("privacyBtn").addEventListener("click", showPrivacy);
+    $("panelClose").addEventListener("click", () => panel.hidden = true);
 
-    bind("closePanelBtn", closePanel);
+    window.maraBridge.onTabs(data => {
+      tabs = data.tabs || [];
+      activeTabId = data.activeTabId;
+      renderTabs();
 
-    // Also open these panels from the keyboard if desired.
-    window.MaraOpenBookmarks = openBookmarksPanel;
-    window.MaraOpenHistory = openHistoryPanel;
-
-    window.MaraHistory?.init?.();
-    window.MaraSearch?.init?.();
-    window.MaraShortcuts?.init?.();
-
-    window.maraBridge?.onState?.(state => {
-      if (!state || typeof state !== "object") return;
-
-      if (typeof state.url === "string") {
-        window.MaraCurrentUrl = state.url;
-
-        if (addressBar && document.activeElement !== addressBar) {
-          addressBar.value = state.url.startsWith("file:")
-            ? "Mara · Internal page"
-            : state.url;
+      const current = activeTab();
+      if (current) {
+        status(current.loading ? "Loading…" : "Ready");
+        if (!current.private && /^https?:/.test(current.url)) {
+          window.MaraHistory.record(current.url, current.title);
         }
-
-        const secure = state.url.startsWith("https://");
-        $("securityIndicator").textContent = secure ? "◆" : "◇";
-        $("securityIndicator").title = secure
-          ? "HTTPS connection"
-          : "Connection security varies";
-      }
-
-      if (typeof state.title === "string") {
-        document.title = `${state.title} — Mara`;
-      }
-
-      if (state.loading) {
-        setStatus("Loading…");
-      } else {
-        setStatus(state.title || "Page loaded");
       }
     });
 
-    window.maraBridge?.onError?.(message => {
-      setStatus("Navigation error: " + String(message || "Unknown error"));
+    window.maraBridge.onError(message => status("Error: " + message));
+
+    window.maraBridge.onFocusAddress(() => {
+      address.focus();
+      address.select();
     });
 
-    if (privacyStatus) {
-      privacyStatus.textContent = "Privacy: basic controls";
-    }
+    window.maraBridge.onBookmarkCurrent(() => {
+      $("bookmarkBtn").click();
+    });
 
-    setStatus("Mara is ready");
+    window.MaraThemeEngine.init();
+    window.MaraShortcuts.init();
+
+    status("Mara is ready");
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
+  document.addEventListener("DOMContentLoaded", init);
 })();
