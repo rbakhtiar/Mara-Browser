@@ -1,33 +1,40 @@
+
 "use strict";
 
 const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld("mara", {
-  navigate: (address) =>
-    ipcRenderer.invoke("browser:navigate", address),
+contextBridge.exposeInMainWorld("maraBridge", Object.freeze({
+  navigate: (id, url) => ipcRenderer.invoke("mara:navigate", id, url),
+  newTab: options => ipcRenderer.invoke("mara:new-tab", options || {}),
+  activateTab: id => ipcRenderer.invoke("mara:activate-tab", id),
+  closeTab: id => ipcRenderer.invoke("mara:close-tab", id),
+  back: () => ipcRenderer.invoke("mara:back"),
+  forward: () => ipcRenderer.invoke("mara:forward"),
+  reload: () => ipcRenderer.invoke("mara:reload"),
+  getPrivacyInfo: () => ipcRenderer.invoke("mara:privacy-info"),
+  openExternal: url => ipcRenderer.invoke("mara:open-external", url),
 
-  back: () => ipcRenderer.invoke("browser:back"),
-  forward: () => ipcRenderer.invoke("browser:forward"),
-  reload: () => ipcRenderer.invoke("browser:reload"),
-  home: () => ipcRenderer.invoke("browser:home"),
-  updateBounds: () => ipcRenderer.invoke("browser:bounds"),
-  getPrivacyInfo: () => ipcRenderer.invoke("browser:privacy"),
-
-  onState: (callback) => {
-    const listener = (_event, state) => callback(state);
-    ipcRenderer.on("browser:state", listener);
-
-    return () => {
-      ipcRenderer.removeListener("browser:state", listener);
-    };
+  onTabs: callback => {
+    const listener = (_event, data) => callback(data);
+    ipcRenderer.on("mara:tabs", listener);
+    return () => ipcRenderer.removeListener("mara:tabs", listener);
   },
 
-  onError: (callback) => {
-    const listener = (_event, error) => callback(error);
-    ipcRenderer.on("browser:error", listener);
+  onError: callback => {
+    const listener = (_event, message) => callback(message);
+    ipcRenderer.on("mara:error", listener);
+    return () => ipcRenderer.removeListener("mara:error", listener);
+  },
 
-    return () => {
-      ipcRenderer.removeListener("browser:error", listener);
-    };
+  onFocusAddress: callback => {
+    const listener = () => callback();
+    ipcRenderer.on("mara:focus-address", listener);
+    return () => ipcRenderer.removeListener("mara:focus-address", listener);
+  },
+
+  onBookmarkCurrent: callback => {
+    const listener = () => callback();
+    ipcRenderer.on("mara:bookmark-current", listener);
+    return () => ipcRenderer.removeListener("mara:bookmark-current", listener);
   }
-});
+}));
