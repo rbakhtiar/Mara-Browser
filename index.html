@@ -2,67 +2,1080 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self';">
-  <title>Mara Browser</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b0b">
+<title>Mara — Browse Beyond</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #080b0b;
+  --panel: rgba(18, 24, 23, .78);
+  --panel-solid: #121817;
+  --text: #f4f4ee;
+  --muted: #939d96;
+  --accent: #55e0a0;
+  --accent2: #b9ffdb;
+  --line: rgba(255,255,255,.10);
+  --radius: 22px;
+  --wallpaper: linear-gradient(135deg,#061e18,#0a3827,#07110f);
+}
+
+* { box-sizing: border-box; }
+
+html { min-height: 100%; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  overflow-x: hidden;
+  transition: background .35s, color .35s;
+}
+
+button, input, select { font: inherit; }
+button { color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.wallpaper {
+  position: fixed;
+  z-index: -2;
+  inset: 0;
+  background: var(--wallpaper);
+  transition: background .4s;
+}
+
+.wallpaper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 12%,rgba(45,226,163,.20),transparent 34%),
+    radial-gradient(ellipse at 88% 30%,rgba(39,103,255,.15),transparent 38%),
+    radial-gradient(ellipse at 55% 105%,rgba(0,0,0,.8),transparent 55%);
+}
+
+body[data-theme="liquid"] .wallpaper {
+  background:
+    radial-gradient(ellipse at 18% 15%,#ff4aab 0%,transparent 22%),
+    radial-gradient(ellipse at 75% 15%,#4b39ff 0%,transparent 35%),
+    radial-gradient(ellipse at 60% 75%,#fb3d8a 0%,transparent 24%),
+    linear-gradient(140deg,#05051b,#16106a 50%,#08041b);
+}
+body[data-theme="forest"] .wallpaper {
+  background:
+    radial-gradient(ellipse at 20% 20%,#27683b,transparent 32%),
+    radial-gradient(ellipse at 80% 60%,#0b4e31,transparent 35%),
+    linear-gradient(145deg,#07150d,#10291b,#020705);
+}
+body[data-theme="sunset"] .wallpaper {
+  background:
+    radial-gradient(ellipse at 75% 15%,#38c8ff,transparent 32%),
+    linear-gradient(160deg,#08bdf4,#fe364c 46%,#ff821b 70%,#e914a4);
+}
+body[data-theme="lavender"] .wallpaper {
+  background:
+    radial-gradient(ellipse at 15% 15%,#eee0ff,transparent 35%),
+    radial-gradient(ellipse at 80% 65%,#b6a9ff,transparent 40%),
+    linear-gradient(140deg,#d9d5f5,#a9b4e6,#f5cde8);
+}
+body[data-theme="lavender"] {
+  --text: #22233a;
+  --muted: #686984;
+  --panel: rgba(255,255,255,.48);
+  --panel-solid: #f0edff;
+  --line: rgba(50,45,90,.13);
+  --accent: #5149c9;
+  --accent2: #7268ef;
+}
+
+body[data-theme="sunset"] {
+  --accent: #fff0a3;
+  --accent2: #ffe3d0;
+}
+
+body[data-theme="midnight"] .wallpaper {
+  background: radial-gradient(ellipse at 50% 0%,#20244c,transparent 55%),
+              linear-gradient(145deg,#070811,#111321,#050609);
+}
+
+button {
+  border: 0;
+  background: transparent;
+}
+
+button:hover { filter: brightness(1.15); }
+
+.topbar {
+  height: 45px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+  background: rgba(5,8,8,.78);
+  backdrop-filter: blur(22px);
+  border-bottom: 1px solid var(--line);
+}
+
+.traffic { display:flex; gap:7px; margin-right:6px; }
+.traffic span {
+  width:10px; height:10px; border-radius:50%;
+  background:#ff6259;
+}
+.traffic span:nth-child(2) { background:#ffc34b; }
+.traffic span:nth-child(3) { background:#43d875; }
+
+.brand {
+  display:flex; align-items:center; gap:9px;
+  font-family:Alegreya,Georgia,serif;
+  font-size:22px; font-weight:800; letter-spacing:-.7px;
+}
+.brand-mark {
+  display:grid; place-items:center;
+  width:25px; height:25px;
+  border-radius:8px;
+  background:var(--accent);
+  color:#07130d;
+  font-family:Alegreya,serif;
+  font-size:19px;
+}
+
+.top-status {
+  margin-left:auto;
+  color:var(--muted);
+  font-size:11px;
+  display:flex; align-items:center; gap:7px;
+}
+.status-dot { width:6px;height:6px;border-radius:50%;background:var(--accent); }
+
+.icon-btn {
+  display:grid; place-items:center;
+  width:34px; height:34px; border-radius:11px;
+  color:var(--muted);
+  transition:background .2s,color .2s;
+}
+.icon-btn:hover { background:var(--panel); color:var(--text); }
+
+.browserbar {
+  display:flex; gap:9px; align-items:center;
+  padding:10px 18px;
+  background:rgba(7,10,10,.7);
+  backdrop-filter:blur(22px);
+  border-bottom:1px solid var(--line);
+}
+
+.nav-buttons { display:flex; gap:3px; }
+
+.address {
+  height:40px; flex:1; min-width:80px;
+  display:flex; align-items:center; gap:10px;
+  padding:0 14px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:rgba(255,255,255,.055);
+  transition:border .2s,background .2s;
+}
+.address:focus-within {
+  border-color:var(--accent);
+  background:rgba(255,255,255,.09);
+}
+.address .lock { color:var(--accent); font-size:13px; }
+.address input {
+  width:100%; color:var(--text);
+  border:0; outline:0; background:transparent;
+  font-size:12px;
+}
+.address input::placeholder { color:var(--muted); }
+
+.toolbar-action {
+  width:38px; height:38px;
+  border-radius:13px; border:1px solid var(--line);
+  background:var(--panel);
+  display:grid; place-items:center;
+}
+.toolbar-action:hover { border-color:var(--accent); }
+
+.shell {
+  width:min(1200px,100%);
+  margin:0 auto;
+  padding:35px 30px 60px;
+}
+
+.hero {
+  position:relative;
+  min-height:270px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:34px 15px 38px;
+}
+
+.eyebrow {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:7px 11px;
+  color:var(--accent2);
+  border:1px solid rgba(85,224,160,.24);
+  background:rgba(85,224,160,.07);
+  border-radius:30px;
+  text-transform:uppercase;
+  font-size:9px; letter-spacing:2px; font-weight:700;
+}
+
+.hero h1 {
+  margin:20px 0 5px;
+  font-family:Alegreya,Georgia,serif;
+  font-size:clamp(48px,8vw,86px);
+  line-height:.95;
+  letter-spacing:-3px;
+  font-weight:600;
+}
+.hero h1 span {
+  color:var(--accent);
+  font-style:italic;
+}
+.hero p {
+  margin:14px 0 25px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.searchbox {
+  display:flex; align-items:center; gap:12px;
+  width:min(650px,100%);
+  height:58px; padding:7px 8px 7px 18px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:19px;
+  background:rgba(12,17,16,.68);
+  box-shadow:0 18px 70px rgba(0,0,0,.24);
+  backdrop-filter:blur(26px);
+  text-align:left;
+  transition:border .2s,transform .2s;
+}
+.searchbox:focus-within {
+  border-color:var(--accent);
+  transform:translateY(-2px);
+}
+.search-symbol { color:var(--accent); font-size:19px; }
+.searchbox input {
+  flex:1; min-width:0;
+  background:transparent; border:0; outline:0;
+  color:var(--text); font-size:13px;
+}
+.searchbox input::placeholder { color:var(--muted); }
+.search-hint {
+  padding:6px 8px; border-radius:7px;
+  border:1px solid var(--line); color:var(--muted);
+  font-size:10px; white-space:nowrap;
+}
+.search-submit {
+  height:42px; padding:0 16px;
+  border-radius:13px;
+  color:#06140c; background:var(--accent);
+  font-weight:800;
+}
+
+.quicklinks {
+  display:flex; flex-wrap:wrap; justify-content:center;
+  gap:12px; margin-top:25px;
+}
+.quicklink {
+  display:flex; align-items:center; gap:9px;
+  min-width:110px; padding:10px 13px;
+  border:1px solid var(--line);
+  background:var(--panel);
+  border-radius:14px;
+  color:var(--text);
+  text-decoration:none;
+  transition:transform .2s,border .2s,background .2s;
+}
+.quicklink:hover { transform:translateY(-3px); border-color:var(--accent); }
+.quick-icon {
+  width:28px;height:28px;display:grid;place-items:center;
+  border-radius:9px;background:rgba(255,255,255,.08);
+  font-size:14px;
+}
+.quicklink span:last-child { font-size:11px; font-weight:600; }
+
+.section-head {
+  display:flex; align-items:end; justify-content:space-between;
+  gap:15px; margin:32px 0 15px;
+}
+.section-head h2 {
+  margin:0; font-family:Alegreya,Georgia,serif;
+  font-size:26px; font-weight:600; letter-spacing:-.4px;
+}
+.section-head p { margin:5px 0 0; color:var(--muted); font-size:11px; }
+.section-action {
+  color:var(--accent); font-size:11px; font-weight:700;
+}
+
+.grid { display:grid; gap:15px; }
+.grid-3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.grid-2 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+
+.card {
+  position:relative; min-width:0; overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:var(--panel);
+  backdrop-filter:blur(20px);
+  box-shadow:0 12px 40px rgba(0,0,0,.08);
+  transition:transform .22s,border .22s;
+}
+.card:hover { transform:translateY(-3px); border-color:rgba(255,255,255,.22); }
+
+.wallpaper-card {
+  min-height:180px;
+  padding:18px;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+.wallpaper-preview {
+  position:absolute; inset:0; z-index:-1;
+  opacity:.8;
+}
+.preview-liquid {
+  background:
+    radial-gradient(ellipse at 20% 20%,#f45cc4,transparent 35%),
+    radial-gradient(ellipse at 80% 20%,#5947ff,transparent 40%),
+    radial-gradient(ellipse at 65% 90%,#fa417e,transparent 35%),
+    #100d42;
+}
+.preview-forest {
+  background:
+    radial-gradient(ellipse at 25% 15%,#317a40,transparent 35%),
+    radial-gradient(ellipse at 75% 80%,#103d27,transparent 50%),
+    #05150c;
+}
+.preview-sunset {
+  background:linear-gradient(150deg,#16c5ff,#ff364c 48%,#ff8d13 72%,#ee159b);
+}
+.preview-lavender {
+  background:linear-gradient(140deg,#ded9ff,#aeb7ee,#f9cde8);
+}
+.wallpaper-card::after {
+  content:""; position:absolute; inset:0; z-index:-1;
+  background:linear-gradient(0deg,rgba(0,0,0,.82),transparent 85%);
+}
+.wallpaper-card h3 {
+  margin:0; font-family:Alegreya,Georgia,serif;
+  font-size:27px; font-weight:600;
+}
+.wallpaper-card p { margin:5px 0 0; color:#e1e5e0; font-size:11px; }
+.apply-btn {
+  align-self:flex-start;
+  padding:9px 13px; border-radius:11px;
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.25);
+  backdrop-filter:blur(10px);
+  color:white; font-size:10px; font-weight:700;
+}
+
+.stat-card { padding:20px; min-height:142px; }
+.stat-top { display:flex; justify-content:space-between; align-items:center; }
+.stat-icon {
+  display:grid; place-items:center;
+  width:36px;height:36px;border-radius:12px;
+  color:var(--accent); background:rgba(85,224,160,.10);
+  font-size:17px;
+}
+.stat-label { color:var(--muted); font-size:11px; }
+.stat-value {
+  margin-top:16px; font-family:Alegreya,Georgia,serif;
+  font-size:32px; line-height:1;
+}
+.stat-caption { margin-top:7px; color:var(--muted); font-size:10px; }
+
+.editorial {
+  min-height:205px;
+  padding:25px;
+  background:
+    linear-gradient(90deg,rgba(3,9,6,.92),rgba(3,9,6,.2)),
+    radial-gradient(ellipse at 75% 20%,#5d7c42,transparent 35%),
+    radial-gradient(ellipse at 80% 100%,#142e19,transparent 50%),
+    #0b1a10;
+}
+.editorial .date {
+  color:var(--accent2); font-size:10px;
+  letter-spacing:2px; text-transform:uppercase;
+}
+.editorial h3 {
+  max-width:450px; margin:25px 0 8px;
+  font-family:Alegreya,Georgia,serif;
+  font-size:clamp(30px,4vw,46px);
+  line-height:.98; font-weight:600;
+}
+.editorial p { max-width:390px; color:#c2ccc3; line-height:1.7; font-size:11px; }
+.editorial button {
+  margin-top:9px; padding:10px 14px;
+  border-radius:10px; background:var(--accent);
+  color:#07150c; font-weight:800; font-size:10px;
+}
+
+.activity { padding:20px; }
+.activity-row {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 0; border-bottom:1px solid var(--line);
+}
+.activity-row:last-child { border:0; }
+.activity-mark {
+  width:34px;height:34px;flex:0 0 34px;
+  display:grid;place-items:center;border-radius:11px;
+  background:rgba(255,255,255,.07); color:var(--accent);
+}
+.activity-row strong { display:block; font-size:11px; font-weight:600; }
+.activity-row small { display:block; color:var(--muted); margin-top:5px; font-size:10px; }
+
+.customize { padding:21px; }
+.setting {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:14px; padding:12px 0; border-bottom:1px solid var(--line);
+}
+.setting:last-child { border-bottom:0; }
+.setting strong { display:block; font-size:11px; }
+.setting small { display:block; margin-top:5px; color:var(--muted); font-size:10px; }
+.switch { position:relative; width:37px; height:21px; flex-shrink:0; }
+.switch input { opacity:0; width:0; height:0; }
+.slider {
+  position:absolute; inset:0; border-radius:20px;
+  background:#454b48; transition:.2s; cursor:pointer;
+}
+.slider::before {
+  content:""; position:absolute; width:15px;height:15px;
+  left:3px;top:3px;border-radius:50%;
+  background:#fff;transition:.2s;
+}
+.switch input:checked + .slider { background:var(--accent); }
+.switch input:checked + .slider::before { transform:translateX(16px); background:#07140c; }
+
+.palette { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+.swatch {
+  width:29px;height:29px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.5);
+  outline:2px solid transparent; outline-offset:2px;
+}
+.swatch.active { outline-color:var(--accent); }
+.footer {
+  display:flex; justify-content:space-between; gap:15px;
+  margin-top:40px; padding-top:18px;
+  border-top:1px solid var(--line);
+  color:var(--muted); font-size:10px;
+}
+.footer strong { color:var(--text); font-family:Alegreya,Georgia,serif; font-size:15px; }
+
+.toast {
+  position:fixed; bottom:22px; left:50%;
+  transform:translate(-50%,20px);
+  opacity:0; pointer-events:none;
+  padding:12px 18px; border-radius:13px;
+  border:1px solid var(--line);
+  background:var(--panel-solid); color:var(--text);
+  box-shadow:0 15px 45px rgba(0,0,0,.3);
+  transition:.25s; z-index:20;
+}
+.toast.show { opacity:1; transform:translate(-50%,0); }
+
+.modal-backdrop {
+  position:fixed; inset:0; z-index:10;
+  display:none; place-items:center; padding:20px;
+  background:rgba(0,0,0,.65); backdrop-filter:blur(10px);
+}
+.modal-backdrop.open { display:grid; }
+.modal {
+  width:min(450px,100%); padding:24px;
+  border:1px solid var(--line); border-radius:24px;
+  background:var(--panel-solid);
+  box-shadow:0 30px 100px rgba(0,0,0,.4);
+}
+.modal h2 { margin:0; font-family:Alegreya,Georgia,serif; font-size:30px; }
+.modal p { color:var(--muted); font-size:12px; line-height:1.6; }
+.modal input {
+  width:100%; margin:12px 0; padding:12px 14px;
+  border:1px solid var(--line); border-radius:12px;
+  background:var(--bg); color:var(--text);
+}
+.modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:15px; }
+.modal-actions button { padding:10px 14px; border-radius:11px; }
+.primary { background:var(--accent); color:#07140c; font-weight:800; }
+
+@media (max-width:760px) {
+  .shell { padding:15px 15px 35px; }
+  .hero { min-height:245px; padding-top:30px; }
+  .hero h1 { letter-spacing:-2px; }
+  .grid-3 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .grid-3 .wallpaper-card:last-child { grid-column:span 2; }
+  .grid-2 { grid-template-columns:1fr; }
+  .search-hint { display:none; }
+  .top-status { display:none; }
+  .brand { font-size:20px; }
+  .browserbar { padding:8px 10px; gap:4px; }
+  .nav-buttons .icon-btn { width:29px; }
+  .address { height:37px; padding:0 10px; }
+  .toolbar-action { width:34px;height:34px; }
+  .quicklinks { gap:8px; }
+  .quicklink { min-width:calc(50% - 8px); }
+  .footer { flex-direction:column; }
+}
+@media (max-width:390px) {
+  .grid-3 { grid-template-columns:1fr; }
+  .grid-3 .wallpaper-card:last-child { grid-column:auto; }
+  .searchbox { gap:8px; padding-left:12px; }
+  .search-submit { padding:0 11px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; }
+}
+</style>
 </head>
-<body class="browser-shell">
-  <header class="browser-header">
-    <div class="brand-row">
-      <div class="brand">
-        <span class="brand-mark">✦</span>
-        <span class="brand-name">MARA</span>
-        <span class="brand-caption">BROWSER</span>
+
+<body data-theme="forest">
+<div class="wallpaper"></div>
+
+<header class="topbar">
+  <div class="traffic" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="brand"><span class="brand-mark">M</span> mara</div>
+  <span style="color:var(--muted);font-size:11px">/ Browse beyond.</span>
+  <div class="top-status"><span class="status-dot"></span> Your space. Your rules.</div>
+  <button class="icon-btn" id="openSettings" title="Customize Mara" aria-label="Customize Mara">⚙</button>
+</header>
+
+<div class="browserbar">
+  <div class="nav-buttons">
+    <button class="icon-btn" id="back" title="Back" aria-label="Back">←</button>
+    <button class="icon-btn" id="forward" title="Forward" aria-label="Forward">→</button>
+    <button class="icon-btn" id="reload" title="Reload" aria-label="Reload">↻</button>
+  </div>
+  <form class="address" id="addressForm">
+    <span class="lock">◈</span>
+    <input id="addressInput" placeholder="Search or enter a website" autocomplete="off" spellcheck="false">
+    <button type="submit" class="icon-btn" title="Go" aria-label="Go">↵</button>
+  </form>
+  <button class="toolbar-action" id="bookmarkBtn" title="Save current page" aria-label="Save current page">☆</button>
+  <button class="toolbar-action" id="newTabBtn" title="New tab" aria-label="New tab">＋</button>
+</div>
+
+<main class="shell">
+  <section class="hero">
+    <div class="eyebrow"><span class="status-dot"></span> A different kind of browser</div>
+    <h1>Make the web<br><span>feel like yours.</span></h1>
+    <p>A little less noise. A lot more you.</p>
+
+    <form class="searchbox" id="searchForm">
+      <span class="search-symbol">⌕</span>
+      <input id="searchInput" placeholder="Where do you want to go?" autocomplete="off">
+      <span class="search-hint">Search the web</span>
+      <button class="search-submit" type="submit">Explore ↗</button>
+    </form>
+
+    <div class="quicklinks" id="quicklinks">
+      <a class="quicklink" href="https://www.google.com"><span class="quick-icon">G</span><span>Google</span></a>
+      <a class="quicklink" href="https://www.youtube.com"><span class="quick-icon">▶</span><span>YouTube</span></a>
+      <a class="quicklink" href="https://github.com"><span class="quick-icon">⌘</span><span>GitHub</span></a>
+      <a class="quicklink" href="https://www.wikipedia.org"><span class="quick-icon">W</span><span>Wikipedia</span></a>
+      <button class="quicklink" id="addShortcut"><span class="quick-icon">＋</span><span>Add shortcut</span></button>
+    </div>
+  </section>
+
+  <div class="section-head">
+    <div><h2>Your visual world</h2><p>Four moods. One browser. Make it yours.</p></div>
+    <button class="section-action" id="randomTheme">Surprise me ↗</button>
+  </div>
+
+  <section class="grid grid-3">
+    <article class="card wallpaper-card">
+      <div class="wallpaper-preview preview-liquid"></div>
+      <div><h3>Liquid Neon</h3><p>Electric colour. Unapologetic energy.</p></div>
+      <button class="apply-btn" data-theme-choice="liquid">Use this mood ↗</button>
+    </article>
+    <article class="card wallpaper-card">
+      <div class="wallpaper-preview preview-forest"></div>
+      <div><h3>Deep Forest</h3><p>Dark emerald. Quiet confidence.</p></div>
+      <button class="apply-btn" data-theme-choice="forest">Use this mood ↗</button>
+    </article>
+    <article class="card wallpaper-card">
+      <div class="wallpaper-preview preview-sunset"></div>
+      <div><h3>Prism Sunset</h3><p>Colour with absolutely no restraint.</p></div>
+      <button class="apply-btn" data-theme-choice="sunset">Use this mood ↗</button>
+    </article>
+  </section>
+
+  <div class="section-head">
+    <div><h2>The little details</h2><p>A workspace that feels considered, not cluttered.</p></div>
+  </div>
+
+  <section class="grid grid-3">
+    <article class="card stat-card">
+      <div class="stat-top"><span class="stat-label">Your shortcuts</span><span class="stat-icon">⌘</span></div>
+      <div class="stat-value" id="shortcutCount">4</div>
+      <div class="stat-caption">Places, one click away</div>
+    </article>
+    <article class="card stat-card">
+      <div class="stat-top"><span class="stat-label">Saved pages</span><span class="stat-icon">☆</span></div>
+      <div class="stat-value" id="bookmarkCount">0</div>
+      <div class="stat-caption">Stored on this device</div>
+    </article>
+    <article class="card stat-card">
+      <div class="stat-top"><span class="stat-label">Your current mood</span><span class="stat-icon">◉</span></div>
+      <div class="stat-value" id="themeName" style="font-size:27px">Forest</div>
+      <div class="stat-caption">Change it whenever you like</div>
+    </article>
+  </section>
+
+  <div class="section-head">
+    <div><h2>The Wednesday Brief</h2><p>A cinematic corner for your next discovery.</p></div>
+    <span class="section-action">MARA EDITION · 01</span>
+  </div>
+
+  <section class="card editorial">
+    <div class="date" id="todayDate">THE MARA EDITION</div>
+    <h3>The internet is a place.<br>Make it feel like home.</h3>
+    <p>Your browser is the first thing you open and the place you return to. It should feel intentional, personal, and unmistakably yours.</p>
+    <button id="editorialExplore">Discover something ↗</button>
+  </section>
+
+  <div class="section-head">
+    <div><h2>Your workspace</h2><p>Small controls. Big difference.</p></div>
+  </div>
+
+  <section class="grid grid-2">
+    <article class="card activity">
+      <div class="section-head" style="margin:0 0 8px"><div><h2 style="font-size:22px">Quick actions</h2><p>Get where you need to go.</p></div></div>
+      <div class="activity-row">
+        <span class="activity-mark">⌕</span>
+        <div><strong>Search the web</strong><small>Look up anything, right from here.</small></div>
+        <button class="icon-btn" data-focus="searchInput" aria-label="Focus search">↗</button>
       </div>
-      <span id="privateBadge" hidden>PRIVATE SESSION</span>
-      <button id="customizeBtn" class="quiet-button">Customize</button>
-    </div>
+      <div class="activity-row">
+        <span class="activity-mark">☆</span>
+        <div><strong>Manage bookmarks</strong><small>See the pages you have saved.</small></div>
+        <button class="icon-btn" id="viewBookmarks" aria-label="View bookmarks">↗</button>
+      </div>
+      <div class="activity-row">
+        <span class="activity-mark">◐</span>
+        <div><strong>Change your atmosphere</strong><small>Pick a colour world below.</small></div>
+        <button class="icon-btn" data-focus="themes" aria-label="View themes">↗</button>
+      </div>
+    </article>
 
-    <div id="tabStrip" class="tab-strip" role="tablist" aria-label="Browser tabs"></div>
+    <article class="card customize" id="themes">
+      <div class="section-head" style="margin:0 0 8px"><div><h2 style="font-size:22px">Make it yours</h2><p>Settings are saved on this device.</p></div></div>
+      <div class="setting">
+        <div><strong>Reduce motion</strong><small>Keep transitions calm.</small></div>
+        <label class="switch"><input type="checkbox" id="reduceMotion"><span class="slider"></span></label>
+      </div>
+      <div class="setting">
+        <div><strong>Compact layout</strong><small>Use tighter spacing.</small></div>
+        <label class="switch"><input type="checkbox" id="compactMode"><span class="slider"></span></label>
+      </div>
+      <div class="setting">
+        <div><strong>Show the date</strong><small>Keep the editorial detail visible.</small></div>
+        <label class="switch"><input type="checkbox" id="showDate" checked><span class="slider"></span></label>
+      </div>
+      <div class="palette" aria-label="Choose a theme">
+        <button class="swatch" style="background:#55e0a0" data-theme-choice="forest" aria-label="Forest theme"></button>
+        <button class="swatch" style="background:linear-gradient(135deg,#f45cc4,#5947ff)" data-theme-choice="liquid" aria-label="Liquid Neon theme"></button>
+        <button class="swatch" style="background:linear-gradient(135deg,#16c5ff,#ff364c,#ff8d13)" data-theme-choice="sunset" aria-label="Sunset theme"></button>
+        <button class="swatch" style="background:linear-gradient(135deg,#ded9ff,#aeb7ee)" data-theme-choice="lavender" aria-label="Lavender theme"></button>
+        <button class="swatch" style="background:linear-gradient(135deg,#20244c,#070811)" data-theme-choice="midnight" aria-label="Midnight theme"></button>
+      </div>
+    </article>
+  </section>
 
-    <nav class="navigation-row" aria-label="Navigation">
-      <button id="backBtn" class="icon-button" title="Back">←</button>
-      <button id="forwardBtn" class="icon-button" title="Forward">→</button>
-      <button id="reloadBtn" class="icon-button" title="Reload">↻</button>
-      <button id="homeBtn" class="icon-button" title="New tab">⌂</button>
+  <footer class="footer">
+    <div><strong>mara.</strong><br><span>Browse beyond.</span></div>
+    <div>Designed for your own corner of the internet.</div>
+    <div id="footerTime">YOUR SPACE · YOUR RULES</div>
+  </footer>
+</main>
 
-      <form id="addressForm" class="address-form">
-        <span id="secureMark" aria-hidden="true">◆</span>
-        <input id="addressBar" placeholder="Search or enter a website"
-          aria-label="Search or enter a website"
-          autocomplete="off" spellcheck="false">
-        <button type="submit" class="go-button">Go</button>
-      </form>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-      <button id="bookmarkBtn" class="icon-button gold" title="Bookmark">☆</button>
-      <button id="bookmarksBtn" class="icon-button" title="Bookmarks">▤</button>
-      <button id="historyBtn" class="icon-button" title="History">◷</button>
-      <button id="privacyBtn" class="icon-button" title="Privacy">◈</button>
-    </nav>
+<div class="modal-backdrop" id="modalBackdrop">
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle">Add a shortcut</h2>
+    <p id="modalDescription">Give your favourite website a name and address.</p>
+    <form id="shortcutForm">
+      <input id="shortcutName" placeholder="Name — e.g. My portfolio" maxlength="28" required>
+      <input id="shortcutUrl" placeholder="Website — e.g. https://example.com" required>
+      <div class="modal-actions">
+        <button type="button" id="cancelModal">Cancel</button>
+        <button type="submit" class="primary">Save shortcut</button>
+      </div>
+    </form>
+  </section>
+</div>
 
-    <div class="status-row">
-      <span id="statusText" role="status" aria-live="polite">Ready</span>
-      <span id="statusRight">No AI service · Chromium engine</span>
-    </div>
-  </header>
+<script>
+(() => {
+  "use strict";
 
-  <aside id="sidePanel" class="side-panel" hidden>
-    <div class="panel-heading">
-      <h2 id="panelTitle">Mara</h2>
-      <button id="panelClose" class="icon-button" aria-label="Close panel">×</button>
-    </div>
-    <div id="panelBody"></div>
-  </aside>
+  const $ = selector => document.querySelector(selector);
+  const $$ = selector => [...document.querySelectorAll(selector)];
 
-  <script src="settings-schema.js"></script>
-  <script src="theme-engine.js"></script>
-  <script src="bookmarks.js"></script>
-  <script src="history.js"></script>
-  <script src="privacy.js"></script>
-  <script src="shortcuts.js"></script>
-  <script src="renderer.js"></script>
+  const KEYS = {
+    theme: "mara.single.theme",
+    settings: "mara.single.settings",
+    shortcuts: "mara.single.shortcuts",
+    bookmarks: "mara.single.bookmarks"
+  };
+
+  const defaults = {
+    reduceMotion: false,
+    compactMode: false,
+    showDate: true
+  };
+
+  function read(key, fallback) {
+    try {
+      const value = localStorage.getItem(key);
+      return value === null ? fallback : JSON.parse(value);
+    } catch {
+      return fallback;
+    }
+  }
+
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); }
+    catch { toast("Could not save settings in this browser."); }
+  }
+
+  let settings = { ...defaults, ...read(KEYS.settings, {}) };
+  let shortcuts = read(KEYS.shortcuts, [
+    { name: "Google", url: "https://www.google.com", icon: "G" },
+    { name: "YouTube", url: "https://www.youtube.com", icon: "▶" },
+    { name: "GitHub", url: "https://github.com", icon: "⌘" },
+    { name: "Wikipedia", url: "https://www.wikipedia.org", icon: "W" }
+  ]);
+  let bookmarks = read(KEYS.bookmarks, []);
+
+  function toast(message) {
+    const el = $("#toast");
+    el.textContent = message;
+    el.classList.add("show");
+    clearTimeout(toast.timeout);
+    toast.timeout = setTimeout(() => el.classList.remove("show"), 2300);
+  }
+
+  function applyTheme(theme, announce = true) {
+    const allowed = ["forest", "liquid", "sunset", "lavender", "midnight"];
+    if (!allowed.includes(theme)) theme = "forest";
+
+    document.body.dataset.theme = theme;
+    save(KEYS.theme, theme);
+
+    const names = {
+      forest: "Forest",
+      liquid: "Liquid Neon",
+      sunset: "Prism Sunset",
+      lavender: "Lavender",
+      midnight: "Midnight"
+    };
+    $("#themeName").textContent = names[theme];
+
+    $$("[data-theme-choice]").forEach(button => {
+      const active = button.dataset.themeChoice === theme;
+      button.classList.toggle("active", active);
+      if (button.classList.contains("swatch")) {
+        button.setAttribute("aria-pressed", String(active));
+      }
+    });
+
+    if (announce) toast(names[theme] + " theme applied.");
+  }
+
+  function applySettings() {
+    document.body.classList.toggle("reduce-motion", settings.reduceMotion);
+    document.body.classList.toggle("compact", settings.compactMode);
+    $("#reduceMotion").checked = settings.reduceMotion;
+    $("#compactMode").checked = settings.compactMode;
+    $("#showDate").checked = settings.showDate;
+    $("#todayDate").hidden = !settings.showDate;
+    save(KEYS.settings, settings);
+  }
+
+  function safeUrl(value) {
+    const raw = value.trim();
+    if (!raw) return null;
+
+    if (/^(javascript|data|file|vbscript):/i.test(raw)) {
+      toast("That address type is not allowed.");
+      return null;
+    }
+
+    try {
+      const url = new URL(/^[a-zA-Z][a-zA-Z\d+.-]*:/.test(raw)
+        ? raw
+        : "https://" + raw);
+
+      if (url.protocol !== "https:" && url.protocol !== "http:") {
+        toast("Please use a website beginning with http:// or https://.");
+        return null;
+      }
+      return url.href;
+    } catch {
+      return "https://duckduckgo.com/?q=" + encodeURIComponent(raw);
+    }
+  }
+
+  function navigate(value) {
+    const raw = value.trim();
+    if (!raw) return;
+
+    const looksLikeUrl =
+      /^(https?:\/\/|localhost(?::\d+)?(?:\/|$)|[\w-]+\.[a-z]{2,}(?::\d+)?(?:\/|$))/i.test(raw);
+
+    const destination = looksLikeUrl
+      ? safeUrl(raw)
+      : "https://duckduckgo.com/?q=" + encodeURIComponent(raw);
+
+    if (!destination) return;
+
+    // Connect to Mara's Electron bridge when the host provides one.
+    // This standalone page otherwise opens the destination in a new tab.
+    const bridge = window.maraBridge;
+    try {
+      if (bridge && typeof bridge.navigate === "function") {
+        const activeId = window.__maraActiveTabId;
+        if (activeId !== undefined && activeId !== null) {
+          bridge.navigate(activeId, destination);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Mara navigation bridge:", error);
+    }
+
+    window.open(destination, "_blank", "noopener,noreferrer");
+  }
+
+  function renderShortcuts() {
+    const container = $("#quicklinks");
+    container.innerHTML = "";
+
+    shortcuts.forEach((item, index) => {
+      const a = document.createElement("a");
+      a.className = "quicklink";
+      a.href = item.url;
+
+      const icon = document.createElement("span");
+      icon.className = "quick-icon";
+      icon.textContent = item.icon || item.name.slice(0, 1).toUpperCase();
+
+      const name = document.createElement("span");
+      name.textContent = item.name;
+
+      a.append(icon, name);
+      a.addEventListener("click", event => {
+        event.preventDefault();
+        navigate(item.url);
+      });
+      container.appendChild(a);
+    });
+
+    const add = document.createElement("button");
+    add.className = "quicklink";
+    add.id = "addShortcut";
+    add.innerHTML = '<span class="quick-icon">＋</span><span>Add shortcut</span>';
+    add.addEventListener("click", openShortcutModal);
+    container.appendChild(add);
+
+    $("#shortcutCount").textContent = shortcuts.length;
+  }
+
+  function renderBookmarks() {
+    $("#bookmarkCount").textContent = bookmarks.length;
+  }
+
+  function openShortcutModal() {
+    $("#modalBackdrop").classList.add("open");
+    $("#shortcutName").focus();
+  }
+
+  function closeShortcutModal() {
+    $("#modalBackdrop").classList.remove("open");
+  }
+
+  $("#searchForm").addEventListener("submit", event => {
+    event.preventDefault();
+    navigate($("#searchInput").value);
+  });
+
+  $("#addressForm").addEventListener("submit", event => {
+    event.preventDefault();
+    navigate($("#addressInput").value);
+  });
+
+  $("#back").addEventListener("click", () => {
+    if (window.maraBridge?.goBack) window.maraBridge.goBack();
+    else toast("Back navigation is available in the full Mara browser.");
+  });
+
+  $("#forward").addEventListener("click", () => {
+    if (window.maraBridge?.goForward) window.maraBridge.goForward();
+    else toast("Forward navigation is available in the full Mara browser.");
+  });
+
+  $("#reload").addEventListener("click", () => {
+    if (window.maraBridge?.reload) window.maraBridge.reload();
+    else location.reload();
+  });
+
+  $("#newTabBtn").addEventListener("click", () => {
+    if (window.maraBridge?.newTab) window.maraBridge.newTab();
+    else toast("New-tab creation requires Mara's Electron host.");
+  });
+
+  $("#bookmarkBtn").addEventListener("click", () => {
+    const address = $("#addressInput").value.trim();
+    if (!address) {
+      toast("Enter a website address first.");
+      $("#addressInput").focus();
+      return;
+    }
+
+    const url = safeUrl(address);
+    if (!url) return;
+
+    if (!bookmarks.some(item => item.url === url)) {
+      bookmarks.unshift({
+        url,
+        name: new URL(url).hostname,
+        savedAt: new Date().toISOString()
+      });
+      bookmarks = bookmarks.slice(0, 300);
+      save(KEYS.bookmarks, bookmarks);
+      renderBookmarks();
+      toast("Page saved to your local bookmarks.");
+    } else {
+      toast("That page is already bookmarked.");
+    }
+  });
+
+  $("#viewBookmarks").addEventListener("click", () => {
+    if (!bookmarks.length) {
+      toast("No saved pages yet. Add a website in the address bar.");
+      return;
+    }
+
+    const list = bookmarks.slice(0, 8)
+      .map((item, i) => (i + 1) + ". " + item.name + " — " + item.url)
+      .join("\n");
+
+    const choice = prompt("Your saved pages:\n\n" + list +
+      "\n\nEnter a number to open a page, or cancel.");
+
+    if (choice === null) return;
+    const index = Number(choice) - 1;
+    if (Number.isInteger(index) && bookmarks[index]) {
+      navigate(bookmarks[index].url);
+    }
+  });
+
+  $("#addShortcut").addEventListener("click", openShortcutModal);
+  $("#cancelModal").addEventListener("click", closeShortcutModal);
+
+  $("#modalBackdrop").addEventListener("click", event => {
+    if (event.target === $("#modalBackdrop")) closeShortcutModal();
+  });
+
+  $("#shortcutForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const name = $("#shortcutName").value.trim();
+    const url = safeUrl($("#shortcutUrl").value);
+
+    if (!name || !url) return;
+
+    shortcuts.push({
+      name,
+      url,
+      icon: name.slice(0, 1).toUpperCase()
+    });
+
+    save(KEYS.shortcuts, shortcuts);
+    renderShortcuts();
+    closeShortcutModal();
+    $("#shortcutForm").reset();
+    toast("Shortcut added.");
+  });
+
+  $$("[data-theme-choice]").forEach(button => {
+    button.addEventListener("click", () => applyTheme(button.dataset.themeChoice));
+  });
+
+  $("#randomTheme").addEventListener("click", () => {
+    const themes = ["forest", "liquid", "sunset", "lavender", "midnight"];
+    const current = document.body.dataset.theme;
+    const alternatives = themes.filter(theme => theme !== current);
+    applyTheme(alternatives[Math.floor(Math.random() * alternatives.length)]);
+  });
+
+  $("#openSettings").addEventListener("click", () => {
+    $("#themes").scrollIntoView({ behavior: settings.reduceMotion ? "auto" : "smooth" });
+  });
+
+  $("#editorialExplore").addEventListener("click", () => {
+    navigate("beautiful websites and creative inspiration");
+  });
+
+  $$("[data-focus]").forEach(button => {
+    button.addEventListener("click", () => {
+      const target = document.getElementById(button.dataset.focus);
+      target?.scrollIntoView({ behavior: settings.reduceMotion ? "auto" : "smooth" });
+      target?.focus?.();
+    });
+  });
+
+  $("#reduceMotion").addEventListener("change", event => {
+    settings.reduceMotion = event.target.checked;
+    applySettings();
+  });
+
+  $("#compactMode").addEventListener("change", event => {
+    settings.compactMode = event.target.checked;
+    applySettings();
+  });
+
+  $("#showDate").addEventListener("change", event => {
+    settings.showDate = event.target.checked;
+    applySettings();
+  });
+
+  document.addEventListener("keydown", event => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      $("#searchInput").focus();
+    }
+    if (event.key === "Escape") closeShortcutModal();
+    if (event.key === "/" &&
+        !["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) {
+      event.preventDefault();
+      $("#searchInput").focus();
+    }
+  });
+
+  const now = new Date();
+  $("#todayDate").textContent = now.toLocaleDateString(undefined, {
+    weekday: "long", year: "numeric", month: "long", day: "numeric"
+  }).toUpperCase();
+
+  $("#footerTime").textContent = now.toLocaleDateString(undefined, {
+    month: "short", day: "numeric", year: "numeric"
+  }).toUpperCase() + " · MADE FOR YOU";
+
+  applyTheme(read(KEYS.theme, "forest"), false);
+  applySettings();
+  renderShortcuts();
+  renderBookmarks();
+})();
+</script>
 </body>
 </html>
